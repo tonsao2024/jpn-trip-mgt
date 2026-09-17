@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.vite/
+
+# Environment & secrets (commit เฉพาะ .env.example เท่านั้น)
+.env
+.env.local
+.env.*.local
+serviceAccount*.json
+*-firebase-adminsdk-*.json
+*.pem
+*.key
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+ui-debug.log
+emulator-data/
+firestore_export/
+
+# Test
+coverage/
+
+# System / editor
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.old
+*.copy
+
+# Generated exports (ระบบสร้างเอง ไม่ commit)
+exports/
+*.generated.png
+*.generated.pdf
