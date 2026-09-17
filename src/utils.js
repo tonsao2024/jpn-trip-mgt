@@ -40,7 +40,8 @@ export function svgEl(tag, attrs = {}) {
 /** SVG ฟูจิคุณจาก sprite (ข้อ 38 — ใช้ <use> กับไฟล์เดียว) */
 export function fuji(stateName = 'idle', cls = '') {
   const svg = svgEl('svg', { class: `fuji ${cls}`.trim(), 'aria-hidden': 'true' });
-  svg.append(svgEl('use', { href: `/fuji-mascot.svg#fuji-${stateName}` }));
+  const base = (import.meta.env && import.meta.env.BASE_URL) || '/';
+  svg.append(svgEl('use', { href: `${base.endsWith('/') ? base : base + '/'}fuji-mascot.svg#fuji-${stateName}` }));
   return svg;
 }
 
