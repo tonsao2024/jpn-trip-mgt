@@ -92,13 +92,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check deploy secrets
+        id: check
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          if [ -n "$SA" ] && [ -n "$PID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::ยังไม่ได้ตั้ง FIREBASE_SERVICE_ACCOUNT / FIREBASE_PROJECT_ID — ข้ามการ deploy (ตั้ง secrets แล้วระบบจะ deploy เอง)"
+          fi
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.ready == 'true'
         with:
           node-version: 22
           cache: npm
       - name: Install dependencies
+        if: steps.check.outputs.ready == 'true'
         run: npm ci
       - name: Build production
+        if: steps.check.outputs.ready == 'true'
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -109,8 +124,10 @@ jobs:
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
         run: npm run build
       - id: auth
+        if: steps.check.outputs.ready == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       - name: Deploy to Firebase
+        if: steps.check.outputs.ready == 'true'
         run: npx firebase-tools@14 deploy --only hosting,firestore:rules,storage --project ${{ secrets.FIREBASE_PROJECT_ID }} --non-interactive
