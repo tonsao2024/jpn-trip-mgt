@@ -72,8 +72,14 @@ export function renderTripsView(root) {
     el('div', { class: 'content' }, grid),
     fab({ lucide: 'plus', label: 'สร้างทริป', onClick: () => openTripModal() })
   );
+  // ดึงรายการทริปแบบ real-time (firebase snapshot / demo emitter)
+  const stopWatch = api.watchTrips((trips) => setState({ trips: trips || [] }));
   paint();
-  return subscribe('trips', paint);
+  const unsub = subscribe('trips', paint);
+  return () => {
+    unsub?.();
+    try { stopWatch?.(); } catch { /* ข้าม */ }
+  };
 }
 
 function tripTile(t) {
