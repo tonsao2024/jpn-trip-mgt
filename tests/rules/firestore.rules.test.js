@@ -33,14 +33,24 @@ async function seedTrip() {
 beforeAll(async () => {
   env = await initializeTestEnvironment({
     projectId: 'fuji-rules-test',
-    firestore: { rules: readFileSync('firestore.rules', 'utf8') }
+    hub: { host: '127.0.0.1', port: 4400 },
+    firestore: { rules: readFileSync('firestore.rules', 'utf8'), host: '127.0.0.1', port: 8080 }
   });
   await seedTrip();
 });
 
 afterAll(async () => {
-  await env.clearDatabase();
-  await env.cleanup();
+  // Hub บางครั้งรายงานสถานะ emulator ไม่ตรงตอนปิด — cleanup แบบไม่ให้พัง suite
+  try {
+    await env.clearDatabase();
+  } catch (e) {
+    console.warn('clearDatabase skipped:', e?.message || e);
+  }
+  try {
+    await env.cleanup();
+  } catch (e) {
+    console.warn('cleanup skipped:', e?.message || e);
+  }
 });
 
 describe('Firestore Rules — trips', () => {
