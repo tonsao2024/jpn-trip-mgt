@@ -9,6 +9,10 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   # ข้อ 40 — ตรวจจำนวนไฟล์อัตโนมัติ: เกิน 100 ไฟล์ = fail ทันที, เกิน 80 ไฟล์ = เตือน
   file-count:
@@ -46,7 +50,23 @@ jobs:
       - name: Unit tests
         run: npm test
       - name: Firestore rules tests (Emulator)
-        run: npm run test:rules
+        id: rules
+        run: |
+          set -o pipefail
+          firebase emulators:exec --only firestore --project fuji-rules-test --debug "vitest run tests/rules" 2>&1 | tee /tmp/rules-test.log
+      - name: Report rules test failure to PR
+        if: failure() && steps.rules.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "### 🔥 Firestore rules test log (tail)"
+            echo ''
+            echo '```text'
+            tail -120 /tmp/rules-test.log
+            echo '```'
+          } > /tmp/comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/comment.md || true
       - name: Build production
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
