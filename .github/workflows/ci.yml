@@ -53,7 +53,7 @@ jobs:
         id: rules
         run: |
           set -o pipefail
-          firebase emulators:exec --only firestore --project fuji-rules-test --debug "vitest run tests/rules" 2>&1 | tee /tmp/rules-test.log
+          npx firebase-tools emulators:exec --only firestore --project fuji-rules-test --debug "vitest run tests/rules" 2>&1 | tee /tmp/rules-test.log
       - name: Report rules test failure to PR
         if: failure() && steps.rules.outcome == 'failure'
         env:
