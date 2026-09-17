@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="th" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Fuji Trip — วางแผนทริปญี่ปุ่น</title>
+    <meta name="description" content="วางแผนทริปญี่ปุ่น: แผนการเดินทาง แผนที่ ค่าใช้จ่าย และการเคลียร์ยอด ในที่เดียว" />
+    <meta name="theme-color" content="#e2453c" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/styles/base.css" />
+    <link rel="stylesheet" href="/src/styles/components.css" />
+    <link rel="stylesheet" href="/src/styles/views.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Murecho:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // ตั้งธีมก่อน render เพื่อไม่ให้ฟ้าผิดสี (ไม่มี FOUC)
+      try {
+        var s = JSON.parse(localStorage.getItem('jpn.app-settings') || '{}');
+        var t = s.theme || 'system';
+        var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="splash" class="splash">
+      <svg class="splash-fuji" viewBox="0 0 120 120" width="96" height="96" aria-hidden="true">
+        <defs>
+          <linearGradient id="sfg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#7ea6f4" />
+            <stop offset="1" stop-color="#4a6fd4" />
+          </linearGradient>
+        </defs>
+        <circle cx="60" cy="60" r="56" fill="#eef3ff" />
+        <path d="M60 22 L98 92 Q100 98 92 98 L28 98 Q20 98 22 92 Z" fill="url(#sfg)" />
+        <path d="M60 22 L74 49 Q70 56 64 50 Q60 58 53 51 Q46 57 46 49 Z" fill="#ffffff" />
+        <circle cx="50" cy="74" r="3.2" fill="#2c3a5c" />
+        <circle cx="70" cy="74" r="3.2" fill="#2c3a5c" />
+        <path d="M55 83 Q60 88 65 83" stroke="#2c3a5c" stroke-width="2.4" fill="none" stroke-linecap="round" />
+        <circle cx="42" cy="80" r="3.5" fill="#f7b2c4" opacity="0.85" />
+        <circle cx="78" cy="80" r="3.5" fill="#f7b2c4" opacity="0.85" />
+      </svg>
+      <div class="splash-title">Fuji Trip</div>
+      <div class="splash-dots"><i></i><i></i><i></i></div>
+    </div>
+    <div id="app"></div>
+    <div id="snow-layer" aria-hidden="true"></div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,209 @@
+/* ============================================================
+   Fuji Trip — views.css
+   สไตล์เฉพาะหน้าจอ: login, trips, dashboard, itinerary, map,
+   expenses, settlement, charts, settings และ export sheet
+   ============================================================ */
+
+/* ---------- Login ---------- */
+.login-hero { text-align: center; padding: 26px 0 6px; }
+.login-hero .fuji { width: 110px; height: 110px; }
+.login-tabs { display: flex; gap: 8px; margin: 14px 0; }
+.login-tabs .btn { flex: 1; }
+.login-card { max-width: 420px; margin: 0 auto; }
+.demo-banner {
+  display: flex; gap: 10px; align-items: center;
+  background: var(--warn-soft); color: var(--warn);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px; font-size: 13px; font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* ---------- Trips ---------- */
+.trip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.trip-tile {
+  position: relative; overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer; text-align: left; padding: 0; font: inherit; color: inherit;
+  transition: transform 0.08s ease, box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.trip-tile:active { transform: scale(0.98); }
+.trip-tile__cover {
+  height: 92px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, var(--cv1, #7ea6f4), var(--cv2, #4a6fd4));
+  color: #fff;
+}
+.trip-tile__emoji { font-size: 34px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); }
+.trip-tile__body { padding: 12px 14px 14px; }
+.trip-tile__name { font: 700 15.5px var(--font-disp); }
+.cover-tones { position: absolute; width: 0; height: 0; }
+
+/* ---------- Dashboard ---------- */
+.dash-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 6px 2px 14px;
+}
+.dash-header .fuji { width: 64px; height: 64px; flex: none; }
+.list-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 2px;
+  border-bottom: 1px solid var(--line);
+}
+.list-row:last-child { border-bottom: none; }
+.list-row__main { flex: 1; min-width: 0; }
+.list-row__title { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-row__sub { font-size: 12px; color: var(--muted); }
+.list-row__end { text-align: end; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 14px; }
+
+/* ---------- Itinerary ---------- */
+.day-tabs { margin-bottom: 12px; }
+.timeline { position: relative; padding-left: 20px; }
+.timeline::before {
+  content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px;
+  width: 2.5px; border-radius: 99px;
+  background: linear-gradient(var(--accent-soft), var(--line));
+}
+.tl-item { position: relative; margin-bottom: 10px; }
+.tl-item::before {
+  content: ''; position: absolute; left: -19px; top: 20px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--card); border: 3px solid var(--accent);
+  z-index: 1;
+}
+.tl-card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 14px; padding: 11px 13px;
+  box-shadow: var(--shadow-sm);
+}
+.tl-item.draggable { cursor: grab; }
+.tl-item.dragging { opacity: 0.45; }
+.tl-item.drop-target .tl-card { border-color: var(--accent); border-style: dashed; }
+.tl-time { font: 700 13px var(--font-disp); color: var(--accent-600); min-width: 74px; }
+.tl-head { display: flex; align-items: baseline; gap: 8px; }
+.tl-title { font-weight: 700; font-size: 14.5px; flex: 1; min-width: 0; }
+.conflict-tip {
+  margin-top: 8px; font-size: 12.5px; font-weight: 600;
+  color: var(--warn); background: var(--warn-soft);
+  padding: 6px 10px; border-radius: 9px;
+  display: flex; align-items: center; gap: 6px;
+}
+.place-line { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+
+/* ---------- Map ---------- */
+.map-page { display: flex; flex-direction: column; height: calc(100dvh - 58px); }
+.map-wrap { position: relative; flex: 1; min-height: 320px; }
+#map { position: absolute; inset: 0; background: var(--bg-soft); }
+.map-chips {
+  position: absolute; top: 10px; left: 10px; right: 10px; z-index: 500;
+  display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+}
+.map-chips .chip { background: color-mix(in srgb, var(--card) 92%, transparent); box-shadow: var(--shadow-sm); }
+.leaflet-popup-content-wrapper { border-radius: 12px; }
+.map-credit { font-size: 11px; color: var(--muted); padding: 6px 2px; }
+.mini-map { height: 260px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+
+/* ---------- Expenses ---------- */
+.sum-bar {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  margin-bottom: 12px;
+}
+.exp-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 2px; border-bottom: 1px solid var(--line);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.exp-row:last-child { border-bottom: none; }
+.exp-row:active { opacity: 0.75; }
+.exp-emoji {
+  width: 42px; height: 42px; border-radius: 13px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 21px; background: var(--bg-soft);
+}
+.exp-amount { text-align: end; }
+.exp-amount b { font: 700 15px var(--font-disp); font-variant-numeric: tabular-nums; }
+.split-participants { display: flex; flex-wrap: wrap; gap: 6px; }
+.split-check {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1.5px solid var(--line); border-radius: 999px;
+  padding: 6px 11px; font-size: 13px; font-weight: 600;
+  cursor: pointer; background: var(--card); color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+.split-check.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-600); }
+.receipt-thumb {
+  width: 54px; height: 54px; border-radius: 10px; object-fit: cover;
+  border: 1px solid var(--line); flex: none;
+}
+.receipt-drop {
+  border: 2px dashed var(--line); border-radius: 12px;
+  padding: 12px; text-align: center; color: var(--muted);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+
+/* ---------- Settlement ---------- */
+.settle-card {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 14px; padding: 12px 14px; margin-bottom: 9px;
+  box-shadow: var(--shadow-sm);
+}
+.settle-arrow { color: var(--muted); display: flex; }
+.settle-card.paid { opacity: 0.62; }
+.settle-card.paid .settle-amount { text-decoration: line-through; }
+.settle-amount { font: 700 16px var(--font-disp); font-variant-numeric: tabular-nums; }
+.bal-row { display: flex; align-items: center; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--line); }
+.bal-row:last-child { border-bottom: none; }
+
+/* ---------- Charts ---------- */
+.chart-card { margin-bottom: 12px; }
+.chart-box { position: relative; height: 260px; }
+.chart-box--tall { height: 300px; }
+
+/* ---------- Settings ---------- */
+.setting-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 2px; border-bottom: 1px solid var(--line);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-row__icon {
+  width: 38px; height: 38px; border-radius: 11px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft); color: var(--accent);
+}
+.setting-row__main { flex: 1; min-width: 0; }
+.cat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cat-row .input { padding: 8px 10px; }
+
+/* ---------- Export sheet (จับภาพ PNG/PDF) ---------- */
+.export-sheet {
+  position: fixed; left: -9999px; top: 0;
+  width: 400px;
+  background: #ffffff; color: #1f2430;
+  padding: 22px; z-index: -1;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+.export-sheet .ex-head { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e2453c; padding-bottom: 10px; margin-bottom: 12px; }
+.export-sheet .ex-day { font-weight: 700; margin: 12px 0 6px; color: #4a6fd4; }
+.export-sheet .ex-item { display: flex; gap: 8px; padding: 5px 0; border-bottom: 1px dashed #e5e9f2; font-size: 13px; }
+.export-sheet .ex-time { color: #4a6fd4; font-weight: 700; min-width: 78px; }
+
+/* ---------- Misc ---------- */
+.pin-dots { display: flex; gap: 10px; justify-content: center; margin: 10px 0; }
+.pin-dots i { width: 13px; height: 13px; border-radius: 50%; background: var(--line); transition: background 0.12s ease; }
+.pin-dots i.on { background: var(--primary); }
+.section-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin: 20px 0 10px;
+}
+.section-title h2 { margin: 0; font-size: 16px; }
+.countdown-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: color-mix(in srgb, #ffffff 22%, transparent);
+  color: #fff; border-radius: 999px;
+  padding: 3px 11px; font-size: 12px; font-weight: 700;
+}
