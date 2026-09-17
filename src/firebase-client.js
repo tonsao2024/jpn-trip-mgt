@@ -42,12 +42,15 @@ export const FB_CONFIG = {
   projectId: env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: env.VITE_FIREBASE_APP_ID
+  appId: env.VITE_FIREBASE_APP_ID,
+  measurementId: env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 /** ตรวจว่าตั้งค่า Firebase ครบหรือยัง (แสดงในหน้าตั้งค่า) */
 export function firebaseStatus() {
-  const missing = Object.entries(FB_CONFIG).filter(([, v]) => !v).map(([k]) => k);
+  const missing = Object.entries(FB_CONFIG)
+    .filter(([k, v]) => k !== 'measurementId' && !v)
+    .map(([k]) => k);
   return { ok: missing.length === 0, missing };
 }
 

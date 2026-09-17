@@ -51,6 +51,23 @@ async function resolveRole() {
   }
 }
 
+export function friendlyAuthError(e) {
+  const code = e?.code || '';
+  const map = {
+    'auth/unauthorized-domain': 'โดเมนนี้ยังไม่ได้รับอนุญาต — เพิ่มที่ Firebase Console → Authentication → Settings → Authorized domains',
+    'auth/operation-not-allowed': 'ยังไม่ได้เปิดใช้วิธีล็อกอินนี้ — เปิดที่ Authentication → Sign-in method',
+    'auth/admin-restricted-operation': 'ยังไม่ได้เปิดใช้ Anonymous Authentication ใน Firebase Console',
+    'auth/configuration-not-found': 'ยังไม่ได้เปิดใช้ผู้ให้ยืนยันตัวตนนี้ใน Firebase Console',
+    'auth/invalid-credential': 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+    'auth/invalid-email': 'รูปแบบอีเมลไม่ถูกต้อง',
+    'auth/user-not-found': 'ไม่พบบัญชีนี้',
+    'auth/wrong-password': 'รหัสผ่านไม่ถูกต้อง',
+    'auth/too-many-requests': 'พยายามหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่',
+    'auth/network-request-failed': 'เชื่อมต่อเครือข่ายไม่ได้ ลองตรวจอินเทอร์เน็ต'
+  };
+  return new Error(map[code] || e?.message || 'การยืนยันตัวตนล้มเหลว');
+}
+
 export async function adminLogin(email, password) {
   if (FB_MODE === 'demo') {
     if (!email || !password) throw new Error('กรอกอีเมลและรหัสผ่าน (โหมดตัวอย่างใส่อะไรก็ได้)');
@@ -59,7 +76,11 @@ export async function adminLogin(email, password) {
     setState({ session: s, role: 'admin' });
     return;
   }
-  await fbAuth.signInWithEmailAndPassword(auth, email.trim(), password);
+  try {
+    await fbAuth.signInWithEmailAndPassword(auth, email.trim(), password);
+  } catch (e) {
+    throw friendlyAuthError(e);
+  }
   // ตรวจ custom claim admin
   const token = await auth.currentUser.getIdTokenResult();
   if (token.claims?.admin !== true) {
@@ -73,7 +94,11 @@ export async function memberLogin(tripId, pin, profile = {}) {
   if (!pin || pin.length < 4) throw new Error('PIN ต้องมีอย่างน้อย 4 หลัก');
   const pinHash = await sha256(pin.trim());
   if (FB_MODE !== 'demo' && !auth.currentUser) {
-    await fbAuth.signInAnonymously(auth);
+    try {
+      await fbAuth.signInAnonymously(auth);
+    } catch (e) {
+      throw friendlyAuthError(e);
+    }
   }
   try {
     await api.joinTrip(tripId.trim(), pinHash, profile);
