@@ -112,7 +112,7 @@ npm run deploy   # = firebase deploy --only hosting,firestore:rules,storage
 
 ```bash
 npm run test:rules                       # รัน rules tests บน emulator (ต้องมี Java 21+)
-firebase emulators:exec --only firestore "vitest run tests/rules"
+firebase emulators:exec --only firestore --project fuji-rules-test "vitest run tests/rules"
 firebase emulators:start                 # เปิด UI ที่ http://localhost:4000
 # ในไฟล์ .env เพิ่ม VITE_USE_EMULATORS=true เพื่อเชื่อม dev server เข้า emulator
 ```

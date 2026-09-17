@@ -14,7 +14,8 @@ const ALICE = 'alice-uid';
 const PIN_HASH = 'f'.repeat(64);
 
 async function seedTrip() {
-  const admin = env.authenticatedContext(ADMIN);
+  // การสร้างทริป/tripPrivate ต้องมี custom claim admin = true ตาม rules
+  const admin = env.authenticatedContext(ADMIN, { admin: true });
   await assertSucceeds(
     admin.firestore().doc(`trips/${TRIP}`).set({
       name: 'Tokyo Trip',
