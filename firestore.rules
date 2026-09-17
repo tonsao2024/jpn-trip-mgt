@@ -1,0 +1,98 @@
+rules_version = '2';
+
+// Firestore Security Rules — Fuji Trip
+// หลักการ:
+// - ผู้ดูแล (custom claim admin == true) ทำได้ทุกอย่าง
+// - สมาชิกทริปยืนยันตัวตนด้วย Anonymous Auth + PIN (เก็บ SHA-256 hash ใน tripPrivate ที่ client อ่านไม่ได้)
+// - ใครก็ตามที่ผ่าน PIN จะได้เป็นสมาชิก (มีเอกสาร members/{uid}) และอ่าน/เขียนข้อมูลของทริปนั้นได้
+// - การ list ทริปทั้งหมดสงวนให้ผู้ดูแล (สมาชิกเข้าถึงได้เฉพาะทริปที่รู้ id)
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && 'admin' in request.auth.token
+        && request.auth.token.admin == true;
+    }
+
+    function memberOf(tripId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/trips/$(tripId)/members/$(request.auth.uid));
+    }
+
+    function validTrip(d) {
+      return d.name is string && d.name.size() > 0 && d.name.size() <= 120
+        && d.startDate is string && d.startDate.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && d.endDate is string && d.endDate.matches('^\\d{4}-\\d{2}-\\d{2}$');
+    }
+
+    function validExpense(d) {
+      return d.title is string && d.title.size() > 0 && d.title.size() <= 200
+        && d.amount is number && d.amount >= 0 && d.amount <= 10000000
+        && d.paidBy is string && d.paidBy.size() > 0
+        && d.date is string
+        && d.split.get('mode', '') in ['equal', 'amounts', 'shares', 'percent'];
+    }
+
+    function validItem(d) {
+      return d.title is string && d.title.size() > 0 && d.title.size() <= 200
+        && d.date is string
+        && (!('durationMin' in d.keys())
+            || (d.durationMin is number && d.durationMin >= 0 && d.durationMin <= 1440));
+    }
+
+    // เอกสารส่วนตัวของทริป (เก็บ PIN hash) — client อ่านตรง ๆ ไม่ได้ ใช้ภายใน rule เท่านั้น
+    match /tripPrivate/{tripId} {
+      allow get, list: if false;
+      allow create, update: if isAdmin()
+        && request.resource.data.pinHash is string
+        && request.resource.data.pinHash.size() == 64;
+      allow delete: if isAdmin();
+    }
+
+    match /trips/{tripId} {
+      // อ่านรายทริปด้วย id ที่ทราบเท่านั้น (id ถูกสุ่ม เดายาก)
+      allow get: if isAdmin() || memberOf(tripId) || signedIn();
+      allow list: if isAdmin();
+      allow create: if isAdmin() && validTrip(request.resource.data);
+      allow update: if isAdmin() && validTrip(request.resource.data);
+      allow delete: if isAdmin();
+
+      match /members/{memberId} {
+        allow read: if isAdmin() || memberOf(tripId);
+        // สมาชิกสร้างเอกสารตัวเองได้ก็ต่อเมื่อ PIN hash ตรงกับที่เก็บใน tripPrivate
+        allow create: if (signedIn()
+            && memberId == request.auth.uid
+            && request.resource.data.pinHash ==
+               get(/databases/$(database)/documents/tripPrivate/$(tripId)).data.pinHash)
+          || isAdmin();
+        allow update: if isAdmin()
+          || (signedIn() && memberId == request.auth.uid
+              && !request.resource.data.diff(resource.data).affectedKeys()
+                   .hasAny(['pinHash', 'role']));
+        allow delete: if isAdmin();
+      }
+
+      match /itinerary/{itemId} {
+        allow read: if isAdmin() || memberOf(tripId);
+        allow create, update: if (isAdmin() || memberOf(tripId)) && validItem(request.resource.data);
+        allow delete: if isAdmin() || memberOf(tripId);
+      }
+
+      match /expenses/{expenseId} {
+        allow read: if isAdmin() || memberOf(tripId);
+        allow create, update: if (isAdmin() || memberOf(tripId)) && validExpense(request.resource.data);
+        allow delete: if isAdmin() || memberOf(tripId);
+      }
+
+      match /settlements/{settlementId} {
+        allow read: if isAdmin() || memberOf(tripId);
+        allow create, update, delete: if isAdmin() || memberOf(tripId);
+      }
+    }
+  }
+}
